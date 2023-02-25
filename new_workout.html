@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Novo treino</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title has-text-centered">
+          Novo treino
+        </h1>
+        <section class="section is-flexbox is-flex-direction-row new-workout">
+          <h2 class="subtitle has-text-centered">Descreva o treino</h2>
+          <div class="field">
+            <label for="name" class="label">Nome:</label>
+            <div class="control">
+              <input id="name" type="text" class="input is-primary">
+            </div>
+          </div>
+          <div class="field">
+            <label for="weekday" class="label">Dia da semana:</label>
+            <div class="select">
+              <select id="weekday" class="input is-primary">
+                <option value="0">Domingo</option>
+                <option value="1">Segunda-feira</option>
+                <option value="2">Terça-feira</option>
+                <option value="3">Quarta-feira</option>
+                <option value="4">Quinta-feira</option>
+                <option value="5">Sexta-feira</option>
+                <option value="6">Sábado</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Série e repetições:</label>
+            <div class="control">
+              <label class="radio">
+                <input name="series" type="radio" value="3x15">
+                3 séries de 15
+              </label>
+              <label class="radio">
+                <input name="series" type="radio" value="3x12">
+                3 séries de 12
+              </label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label">Possui carga:</label>
+            <div class="control">
+              <label class="radio">
+                <input name="hasLoad" type="radio" value="">
+                Sim
+              </label>
+              <label class="radio">
+                <input name="hasLoad" type="radio" value="1">
+                Não
+              </label>
+            </div>
+          </div>
+          <div class="is-flex is-justify-content-space-around">
+            <button class="button is-ghost" onClick="window.location.href='index.html'">
+              Voltar
+            </button>
+            <button class="button is-primary" onClick="save()">
+              Salvar
+            </button>
+          </div>
+        </section>
+      </div>
+    </section>
+  </body>
+</html>
+
+<style>
+  .new-workout {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #ddd;
+  }
+</style>
+
+<script>
+  const save = () => {
+    const name = document.getElementById("name").value
+    const weekday = document.querySelector('select[id=weekday]').value
+    let series = document.querySelector('input[name=series]:checked')
+    let hasLoad = document.querySelector('input[name=hasLoad]:checked')
+    if (!name || !weekday || !series || !hasLoad) {
+      alert("Todos os campos são obrigatórios")
+      return
+    }
+    series = series.value
+    hasLoad = hasLoad.value
+    let currentWorkoutPlan = localStorage.getItem("workoutPlan") || '[]'
+    currentWorkoutPlan = JSON.parse(currentWorkoutPlan)
+    currentWorkoutPlan.push({
+      name,
+      weekday,
+      series,
+      hasLoad: Boolean(hasLoad)
+    })
+    localStorage.setItem("workoutPlan", JSON.stringify(currentWorkoutPlan))
+    alert("Sucesso!")
+  }
+</script>
