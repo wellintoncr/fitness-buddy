@@ -5,72 +5,62 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Novo treino</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   </head>
   <body>
-    <section class="section">
-      <div class="container">
-        <h1 class="title has-text-centered">
-          Novo treino
-        </h1>
-        <section class="section is-flexbox is-flex-direction-row new-workout">
-          <h2 class="subtitle has-text-centered">Descreva o treino</h2>
-          <div class="field">
-            <label for="name" class="label">Nome:</label>
-            <div class="control">
-              <input id="name" type="text" class="input is-primary">
-            </div>
+    <div id="app" class="section">
+      <section class="section is-flexbox is-flex-direction-row new-workout">
+        <h2 class="subtitle has-text-centered">Descreva o treino</h2>
+        <div class="field">
+          <label class="label">
+            Nome:
+            <input id="name" type="text" class="input is-primary" v-model="name">
+          </label>
+        </div>
+        <div class="field">
+          <label class="label">
+            Dias da semana:
+            <label class="checkbox is-flex mb-2" v-for="(weekday, pos) in availableWeekDays">
+              <input type="checkbox" v-model="weekdays[pos]">
+              <span class="has-text-weight-normal ml-2">{{ weekday }}</span>
+            </label>
+          </label>
+        </div>
+        <div class="field">
+          <label class="label">Série e repetições:</label>
+          <div v-for="(serie, pos) in series">
+            <input type="number" v-model="series[pos]" class="input">
           </div>
-          <div class="field">
-            <label for="weekday" class="label">Dia da semana:</label>
-            <div class="select">
-              <select id="weekday" class="input is-primary">
-                <option value="0">Domingo</option>
-                <option value="1">Segunda-feira</option>
-                <option value="2">Terça-feira</option>
-                <option value="3">Quarta-feira</option>
-                <option value="4">Quinta-feira</option>
-                <option value="5">Sexta-feira</option>
-                <option value="6">Sábado</option>
-              </select>
-            </div>
+          <button @click="addSerie" class="button is-primary is-small mt-2">
+            Adicionar série
+          </button>
+          <button @click="removeSerie" class="button is-danger is-small mt-2 ml-3">
+            Remover série
+          </button>
+        </div>
+        <div class="field">
+          <label class="label">Possui carga/peso:</label>
+          <div class="control">
+            <label class="radio">
+              <input name="hasWeight" type="radio" value="1" v-model="hasWeight">
+              Sim
+            </label>
+            <label class="radio">
+              <input name="hasWeight" type="radio" value="0" v-model="hasWeight">
+              Não
+            </label>
           </div>
-          <div class="field">
-            <label class="label">Série e repetições:</label>
-            <div class="control">
-              <label class="radio">
-                <input name="series" type="radio" value="3x15">
-                3 séries de 15
-              </label>
-              <label class="radio">
-                <input name="series" type="radio" value="3x12">
-                3 séries de 12
-              </label>
-            </div>
-          </div>
-          <div class="field">
-            <label class="label">Possui carga:</label>
-            <div class="control">
-              <label class="radio">
-                <input name="hasLoad" type="radio" value="1">
-                Sim
-              </label>
-              <label class="radio">
-                <input name="hasLoad" type="radio" value="">
-                Não
-              </label>
-            </div>
-          </div>
-          <div class="is-flex is-justify-content-space-around">
-            <button class="button is-ghost" onClick="window.location.href='../index.html'">
-              Voltar
-            </button>
-            <button class="button is-primary" onClick="save()">
-              Salvar
-            </button>
-          </div>
-        </section>
-      </div>
-    </section>
+        </div>
+        <div class="is-flex is-justify-content-space-around">
+          <button class="button is-ghost" onClick="window.location.href='../index.html'">
+            Voltar
+          </button>
+          <button class="button is-primary" @click="save()">
+            Salvar
+          </button>
+        </div>
+      </section>
+    </div>
   </body>
 </html>
 
@@ -83,26 +73,70 @@
 </style>
 
 <script>
-  const save = () => {
-    const name = document.getElementById("name").value
-    const weekday = document.querySelector('select[id=weekday]').value
-    let series = document.querySelector('input[name=series]:checked')
-    let hasLoad = document.querySelector('input[name=hasLoad]:checked')
-    if (!name || !weekday || !series || !hasLoad) {
-      alert("Todos os campos são obrigatórios")
-      return
+  const { createApp } = Vue
+  const DEFAULT_REPETITION = 12
+  
+  createApp({
+    data() {
+      return {
+        name: null,
+        weekdays: Array(7).fill(false),
+        series: [DEFAULT_REPETITION],
+        setting: [],
+        hasWeight: "1",
+        availableWeekDays: {
+          0: "Domingo",
+          1: "Segunda-feira",
+          2: "Terça-feira",
+          3: "Quarta-feira",
+          4: "Quinta-feira",
+          5: "Sexta-feira",
+          6: "Sábado"
+        }
+      }
+    },
+    methods: {
+      addWorkout (newWorkout) {
+        let currentWorkoutPlan = JSON.parse(localStorage.getItem("workoutPlan") || '{}')
+        let workoutLastId = Number(localStorage.getItem("workoutLastId") || 0)
+        if (!workoutLastId || workoutLastId < 0) {
+          currentWorkoutPlan = {} // Make sure it resets all workouts
+        }
+        workoutLastId++
+        currentWorkoutPlan[workoutLastId] = newWorkout
+        localStorage.setItem("workoutPlan", JSON.stringify(currentWorkoutPlan))
+        localStorage.setItem("workoutLastId", workoutLastId)
+      },
+      save() {
+        const weekdays = this.weekdays.map(
+          (value, pos) => value ? pos : null
+        ).filter(value => value != null)
+        this.setting = this.series.filter(
+          value => Number(value) > 0
+        ).map(value => ({repetition: value}))
+        const hasWeight = this.hasWeight == "1"
+        console.log(this.name, weekdays, this.setting, hasWeight)
+        if (!this.name || !weekdays.length || !this.setting.length || !hasWeight) {
+          alert("Todos os campos são obrigatórios")
+          return
+        }
+        this.addWorkout({
+          name: this.name,
+          weekdays: weekdays,
+          setting: this.setting,
+          hasWeight
+        })
+        alert("Sucesso!")
+      },
+      addSerie() {
+        this.series.push(DEFAULT_REPETITION)
+      },
+      removeSerie() {
+        if (this.series.length > 1)
+          this.series.pop()
+      }
     }
-    series = series.value
-    hasLoad = hasLoad.value
-    let currentWorkoutPlan = localStorage.getItem("workoutPlan") || '[]'
-    currentWorkoutPlan = JSON.parse(currentWorkoutPlan)
-    currentWorkoutPlan.push({
-      name,
-      weekday,
-      series,
-      hasLoad: Boolean(hasLoad)
-    })
-    localStorage.setItem("workoutPlan", JSON.stringify(currentWorkoutPlan))
-    alert("Sucesso!")
-  }
+  }).mount('#app')
+
+
 </script>
