@@ -14,28 +14,32 @@
           Treinando
         </h1>
         <div id="app">
-          <div v-for="plan in todayWorkoutPlan">
+          <div v-for="[planId, plan] of Object.entries(todayWorkoutPlan)">
             <section class="section is-flexbox is-flex-direction-row has-text-centered new-section mb-4">
-              <h2 class="subtitle has-text-centered">{{ plan.name }} - {{ plan.series }}</h2>
-              <div v-if="plan.hasLoad" class="field is-flex is-flex-direction-row">
-                <input v-for="each in getSeries(plan.series)" class="input" type="number">
+              <h2 class="subtitle has-text-centered">{{ plan.name }}</h2>
+              <div v-if="plan.hasWeight" class="field is-flex is-flex-direction-row">
+                <label v-for="(each, pos) in plan.setting">
+                  Repetições: <span class="has-text-weight-bold">{{ each.repetition }}</span>
+                  <input class="input" type="number" v-model="each.weight">
+                </label>
               </div>
               <div class="control">
                 <label class="radio">
-                  <input name="difficulty" type="radio" value="1">
+                  <input name="difficulty" type="radio" value="1" v-model="plan.difficulty">
                   Fácil
                 </label>
                 <label class="radio">
-                  <input name="difficulty" type="radio" value="2">
-                  Não sei
+                  <input name="difficulty" type="radio" value="2" v-model="plan.difficulty">
+                  Médio
                 </label>
                 <label class="radio">
-                  <input name="difficulty" type="radio" value="3">
-                  No limite
+                  <input name="difficulty" type="radio" value="3" v-model="plan.difficulty">
+                  Difícil
                 </label>
               </div>
             </section>
           </div>
+          <button class="button is-primary" @click="save">Salvar</button>
         </div>
       </div>
     </section>
@@ -56,27 +60,48 @@
   createApp({
     data() {
       return {
-        message: 'Hello Vue!',
-        todayWorkoutPlan: []
+        todayWorkoutPlan: {},
       }
     },
     mounted() {
-      let currentWorkoutPlan = localStorage.getItem("workoutPlan") || '[]'
+      let currentWorkoutPlan = localStorage.getItem("workoutPlan") || '{}'
       currentWorkoutPlan = JSON.parse(currentWorkoutPlan)
       const today = new Date()
       const weekday = today.getDay()
-      this.todayWorkoutPlan = currentWorkoutPlan.filter(value => value.weekday == weekday)
-      if (!this.todayWorkoutPlan.length) {
+      for (const [key, value] of Object.entries(currentWorkoutPlan)) {
+        if (value.weekdays.includes(weekday)) {
+          // TODO: it should restore today's data or suggestion data - not just 0
+          let setting = value.setting.map(eachSet => {
+            eachSet.weight = 0
+            return eachSet
+          })
+          this.todayWorkoutPlan[key] = {
+            name: value.name,
+            setting,
+            hasWeight: value.hasWeight,
+            difficulty: null
+          }
+        }
+      }
+      if (!Object.keys(this.todayWorkoutPlan).length) {
         alert("Nenhum treino cadastrado para hoje")
         window.location.href="../index.html"
         return
       }
     },
     methods: {
-      getSeries(data) {
-        const numberSeries = data.split('x')[0]
-        console.log(Array(+numberSeries))
-        return Array(+numberSeries).fill(0)
+      save() {
+        let currentWorkoutList = JSON.parse(localStorage.getItem("workoutData") || '{}')
+        const today = new Date()
+        const todayDate = today.toISOString().slice(0, 10)
+        if (!currentWorkoutList[todayDate]) {
+          currentWorkoutList[todayDate] = this.todayWorkoutPlan
+        }
+        else {
+          const merged = {...currentWorkoutList[todayDate], ...this.todayWorkoutPlan}
+          currentWorkoutList[todayDate] = merged
+        }
+        localStorage.setItem("workoutData", JSON.stringify(currentWorkoutList))
       }
     }
   }).mount('#app')
