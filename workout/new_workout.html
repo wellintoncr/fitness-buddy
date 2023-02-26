@@ -116,7 +116,7 @@
         ).map(value => ({repetition: value}))
         const hasWeight = this.hasWeight == "1"
         console.log(this.name, weekdays, this.setting, hasWeight)
-        if (!this.name || !weekdays.length || !this.setting.length || !hasWeight) {
+        if (!this.name || !weekdays.length || !this.setting.length) {
           alert("Todos os campos são obrigatórios")
           return
         }
