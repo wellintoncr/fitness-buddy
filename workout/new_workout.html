@@ -9,6 +9,13 @@
   </head>
   <body>
     <div id="app" class="section">
+      <div :class="modalClass">
+        <div class="modal-background"></div>
+        <div class="modal-content is-flex is-justify-content-center modal-content-container">
+          <p :class="modalDataClass">{{ modalContent }}</p>
+        </div>
+        <button class="modal-close is-large" aria-label="close" @click="modalActive = false"></button>
+      </div>
       <section class="section is-flexbox is-flex-direction-row new-workout">
         <h2 class="subtitle has-text-centered">Descreva o treino</h2>
         <div class="field">
@@ -70,6 +77,26 @@
     border-radius: 10px;
     background-color: #ddd;
   }
+  .modal-data {
+    width: 200px;
+    /* max-width: 300px; */
+    text-align: center;
+    max-height: 200px;
+    border-radius: 10px;
+    margin-top: auto;
+    margin-bottom: auto;
+  }
+  .modal-content-container {
+    height: 100px;
+  }
+  .modal-content-success {
+    background-color: rgb(5, 196, 5);
+    color: white;
+  }
+  .modal-content-error {
+    background-color: rgb(222, 0, 0);
+    color: white;
+  }
 </style>
 
 <script>
@@ -92,7 +119,18 @@
           4: "Quinta-feira",
           5: "Sexta-feira",
           6: "Sábado"
-        }
+        },
+        modalActive: true,
+        modalContent: "Sucesso!",
+        modalType: "success"
+      }
+    },
+    computed: {
+      modalClass() {
+        return 'modal' + (this.modalActive ? ' is-active' : '')
+      },
+      modalDataClass() {
+        return "modal-data modal-content-" + this.modalType
       }
     },
     methods: {
@@ -117,7 +155,9 @@
         const hasWeight = this.hasWeight == "1"
         console.log(this.name, weekdays, this.setting, hasWeight)
         if (!this.name || !weekdays.length || !this.setting.length) {
-          alert("Todos os campos são obrigatórios")
+          this.modalActive = true
+          this.modalType = "error"
+          this.modalContent = "Todos os campos são obrigatórios"
           return
         }
         this.addWorkout({
