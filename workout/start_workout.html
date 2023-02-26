@@ -42,7 +42,7 @@
           </div>
           <div class="is-flex is-flex-direction-row-reverse sticky-container" @click="save">
             <button>
-              <img src="../icons/save.svg" alt="save" width="50" height="50">
+              <img :src="saveButtonSrc" alt="save" width="50" height="50">
             </button>
           </div>
         </div>
@@ -61,7 +61,6 @@
     position: sticky;
     bottom: 10px;
     right: 0;
-    /* width: 100px; */
   }
   .sticky-container button {
     background-color: rgb(68, 173, 68);
@@ -77,25 +76,25 @@
     data() {
       return {
         todayWorkoutPlan: {},
+        saveButtonSrc: "../icons/save.svg"
       }
     },
     mounted() {
       let currentWorkoutPlan = localStorage.getItem("workoutPlan") || '{}'
-      currentWorkoutPlan = JSON.parse(currentWorkoutPlan)
       const today = new Date()
+      currentWorkoutPlan = JSON.parse(currentWorkoutPlan)
       const weekday = today.getDay()
       for (const [key, value] of Object.entries(currentWorkoutPlan)) {
         if (value.weekdays.includes(weekday)) {
-          // TODO: it should restore today's data or suggestion data - not just 0
-          let setting = value.setting.map(eachSet => {
-            eachSet.weight = 0
+          let setting = value.setting.map((eachSet, pos) => {
+            eachSet.weight = this.getCurrentWeight(key, pos)
             return eachSet
           })
           this.todayWorkoutPlan[key] = {
             name: value.name,
             setting,
             hasWeight: value.hasWeight,
-            difficulty: null
+            difficulty: this.getCurrentDifficulty(key)
           }
         }
       }
@@ -118,7 +117,25 @@
           currentWorkoutList[todayDate] = merged
         }
         localStorage.setItem("workoutData", JSON.stringify(currentWorkoutList))
-      }
+        this.saveButtonSrc = "../icons/check.svg"
+        setTimeout(() => this.saveButtonSrc = "../icons/save.svg", 1000)
+      },
+      getCurrentWeight(planId, settingPos) {
+        const today = new Date()
+        const todayDate = today.toISOString().slice(0, 10)
+        let currentWorkoutList = JSON.parse(localStorage.getItem("workoutData") || '{}')
+        let output = currentWorkoutList?.[todayDate]?.[planId].setting[settingPos].weight
+        if (!output) {
+          console.log("Generate suggestion")
+        }
+        return output
+      },
+      getCurrentDifficulty(planId) {
+        const today = new Date()
+        const todayDate = today.toISOString().slice(0, 10)
+        let currentWorkoutList = JSON.parse(localStorage.getItem("workoutData") || '{}')
+        return currentWorkoutList?.[todayDate]?.[planId].difficulty
+      },
     }
   }).mount('#app')
 </script>
