@@ -9,12 +9,8 @@
   </head>
   <body>
     <div id="app" class="section">
-      <div :class="modalClass">
-        <div class="modal-background"></div>
-        <div class="modal-content is-flex is-justify-content-center modal-content-container">
-          <p :class="modalDataClass">{{ modalContent }}</p>
-        </div>
-        <button class="modal-close is-large" aria-label="close" @click="modalActive = false"></button>
+      <div id="snack-bar-element" :class="snackBarClass">
+        {{ snackBarMessage }}
       </div>
       <section class="section is-flexbox is-flex-direction-row new-workout">
         <h2 class="subtitle has-text-centered">Descreva o treino</h2>
@@ -77,25 +73,62 @@
     border-radius: 10px;
     background-color: #ddd;
   }
-  .modal-data {
-    width: 200px;
-    /* max-width: 300px; */
+
+  #snack-bar-element {
+    visibility: hidden;
+    min-width: 250px;
+    margin-left: -125px;
     text-align: center;
-    max-height: 200px;
     border-radius: 10px;
-    margin-top: auto;
-    margin-bottom: auto;
+    padding: 16px;
+    position: fixed;
+    z-index: 1;
+    left: 50%;
+    bottom: 30px;
   }
-  .modal-content-container {
-    height: 100px;
+
+  #snack-bar-element.active {
+    visibility: visible;
+    -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    animation: fadein 0.5s, fadeout 0.5s 2.5s;
   }
-  .modal-content-success {
-    background-color: rgb(5, 196, 5);
+
+  #snack-bar-element.success {
+    background-color: #1e7100;
     color: white;
+    border: 1px solid white;
   }
-  .modal-content-error {
-    background-color: rgb(222, 0, 0);
+
+  #snack-bar-element.error {
+    background-color: #950000;
     color: white;
+    border: 1px solid white;
+  }
+
+  #snack-bar-element.warning {
+    background-color: #d0ff00;
+    color: black;
+    border: 1px solid #999
+  }
+
+  @-webkit-keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+  }
+
+  @keyframes fadein {
+    from {bottom: 0; opacity: 0;}
+    to {bottom: 30px; opacity: 1;}
+  }
+
+  @-webkit-keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
+  }
+
+  @keyframes fadeout {
+    from {bottom: 30px; opacity: 1;}
+    to {bottom: 0; opacity: 0;}
   }
 </style>
 
@@ -120,17 +153,8 @@
           5: "Sexta-feira",
           6: "Sábado"
         },
-        modalActive: true,
-        modalContent: "Sucesso!",
-        modalType: "success"
-      }
-    },
-    computed: {
-      modalClass() {
-        return 'modal' + (this.modalActive ? ' is-active' : '')
-      },
-      modalDataClass() {
-        return "modal-data modal-content-" + this.modalType
+        snackBarClass: "",
+        snackBarMessage: "Sucesso!"
       }
     },
     methods: {
@@ -145,6 +169,11 @@
         localStorage.setItem("workoutPlan", JSON.stringify(currentWorkoutPlan))
         localStorage.setItem("workoutLastId", workoutLastId)
       },
+      showSnackbar(message, type) {
+        this.snackBarMessage = message
+        this.snackBarClass = `active ${type}`
+        setTimeout(() => this.snackBarClass = "", 3000)
+      },
       save() {
         const weekdays = this.weekdays.map(
           (value, pos) => value ? pos : null
@@ -153,11 +182,8 @@
           value => Number(value) > 0
         ).map(value => ({repetition: value}))
         const hasWeight = this.hasWeight == "1"
-        console.log(this.name, weekdays, this.setting, hasWeight)
         if (!this.name || !weekdays.length || !this.setting.length) {
-          this.modalActive = true
-          this.modalType = "error"
-          this.modalContent = "Todos os campos são obrigatórios"
+          this.showSnackbar("Todos os campos são obrigatórios", "warning")
           return
         }
         this.addWorkout({
@@ -166,7 +192,7 @@
           setting: this.setting,
           hasWeight
         })
-        alert("Sucesso!")
+        this.showSnackbar("Sucesso!", "success")
       },
       addSerie() {
         this.series.push(DEFAULT_REPETITION)
