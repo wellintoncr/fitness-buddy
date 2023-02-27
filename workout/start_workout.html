@@ -6,6 +6,7 @@
     <title>Vou treinar agora</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
     <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="../style/snackbar.css">
   </head>
   <body>
     <section class="section">
@@ -14,6 +15,9 @@
           Treinando
         </h1>
         <div id="app">
+          <div id="snack-bar-element" :class="snackBarClass">
+            {{ snackBarMessage }}
+          </div>
           <div v-for="[planId, plan] of Object.entries(todayWorkoutPlan)">
             <section class="section is-flexbox is-flex-direction-row has-text-centered new-section mb-4">
               <h2 class="subtitle has-text-centered">{{ plan.name }}</h2>
@@ -40,7 +44,11 @@
               </div>
             </section>
           </div>
-          <div class="is-flex is-flex-direction-row-reverse sticky-container" @click="save">
+          <div
+            class="is-flex is-flex-direction-row-reverse sticky-container"
+            @click="save"
+            v-if="Object.keys(todayWorkoutPlan).length"
+          >
             <button>
               <img :src="saveButtonSrc" alt="save" width="50" height="50">
             </button>
@@ -76,7 +84,9 @@
     data() {
       return {
         todayWorkoutPlan: {},
-        saveButtonSrc: "../icons/save.svg"
+        saveButtonSrc: "../icons/save.svg",
+        snackBarClass: "",
+        snackBarMessage: "Sucesso!"
       }
     },
     mounted() {
@@ -99,12 +109,17 @@
         }
       }
       if (!Object.keys(this.todayWorkoutPlan).length) {
-        alert("Nenhum treino cadastrado para hoje")
-        window.location.href="../index.html"
+        this.showSnackbar("Nenhum treino cadastrado para hoje", "warning")
+        setTimeout(() => window.location.href="../index.html", 3000)
         return
       }
     },
     methods: {
+      showSnackbar(message, type) {
+        this.snackBarMessage = message
+        this.snackBarClass = `active ${type}`
+        setTimeout(() => this.snackBarClass = "", 3000)
+      },
       save() {
         let currentWorkoutList = JSON.parse(localStorage.getItem("workoutData") || '{}')
         const today = new Date()
@@ -117,8 +132,7 @@
           currentWorkoutList[todayDate] = merged
         }
         localStorage.setItem("workoutData", JSON.stringify(currentWorkoutList))
-        this.saveButtonSrc = "../icons/check.svg"
-        setTimeout(() => this.saveButtonSrc = "../icons/save.svg", 1000)
+        this.showSnackbar("Salvo!", "success")
       },
       getCurrentWeight(planId, settingPos) {
         const today = new Date()
