@@ -22,7 +22,7 @@ python3 -m http.server
 
 # Tarefas
 
-- [ ] [ *Bug* ] Ao selecionar a dificuldade do treino, apenas um treino está sendo selecionado por vez (ex. marco "Difícil" no treino A e, ao marcar "Fácil" no treino B, a dificuldade do treino A é perdida);
+- [x] [ *Bug* ] Ao selecionar a dificuldade do treino, apenas um treino está sendo selecionado por vez (ex. marco "Difícil" no treino A e, ao marcar "Fácil" no treino B, a dificuldade do treino A é perdida);
 
 - [ ] [ *Melhoria* ] Visualizar histórico de treinos
 
