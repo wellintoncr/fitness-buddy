@@ -24,7 +24,7 @@ python3 -m http.server
 
 - [x] [ *Bug* ] Ao selecionar a dificuldade do treino, apenas um treino está sendo selecionado por vez (ex. marco "Difícil" no treino A e, ao marcar "Fácil" no treino B, a dificuldade do treino A é perdida);
 
-- [ ] [ *Melhoria* ] Visualizar histórico de treinos
+- [x] [ *Melhoria* ] Visualizar histórico de treinos
 
 - [ ] [ *Melhoria* ] Sugerir carga - indicar se o treino do dia deve manter ou aumentar a carga;
 

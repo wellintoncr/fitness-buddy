@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Histórico</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.9.4/css/bulma.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link rel="stylesheet" href="../style/snackbar.css">
+  </head>
+  <body>
+    <section class="section">
+      <div class="container">
+        <h1 class="title has-text-centered">
+          Histórico
+        </h1>
+        <div id="app">
+          <div id="snack-bar-element" :class="snackBarClass">
+            {{ snackBarMessage }}
+          </div>
+          <input v-model="selectedDate" type="date" class="input date mb-4">
+          <div v-if="Object.keys(allWorkouts).length">
+            <section class="section new-section mb-4" v-for="[key, each] of Object.entries(allWorkouts)">
+              <p>
+                <strong>Nome:</strong> {{ each.name }}
+              </p>
+              <p>
+                <strong>Dificuldade:</strong> {{ convertDifficulty(each.difficulty) }}
+              </p>
+              <p v-if="each.hasWeight">
+                <strong>Carga:</strong> {{ formatSetting(each.setting, each.hasWeight) }}
+              </p>
+              <p v-else>
+                <strong>Sem Carga:</strong> {{ formatSetting(each.setting, each.hasWeight) }}
+              </p>
+            </section>
+          </div>
+          <section class="section new-section mb-4 has-text-centered" v-else>
+            <strong>Nenhum treino registrado</strong>
+          </section>
+        </div>
+      </div>
+    </section>
+  </body>
+</html>
+
+<style>
+  .new-section {
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #ddd;
+  }
+  .sticky-container {
+    position: sticky;
+    bottom: 10px;
+    right: 0;
+  }
+  .sticky-container button {
+    background-color: rgb(68, 173, 68);
+    border-radius: 100px;
+    border: 1px solid #ddd;
+  }
+</style>
+
+<script>
+  const { createApp } = Vue
+  
+  createApp({
+    data() {
+      return {
+        selectedDate: (new Date()).toISOString().slice(0, 10),
+        snackBarClass: "",
+        snackBarMessage: "Sucesso!"
+      }
+    },
+    computed: {
+      allWorkouts() {
+        let currentWorkoutList = JSON.parse(localStorage.getItem("workoutData") || '{}')
+        let date = (new Date()).toISOString().slice(0, 10)
+        if (this.selectedDate)
+          date = (new Date(this.selectedDate)).toISOString().slice(0, 10)
+        const filteredData = currentWorkoutList[date] || {}
+        let toReturn = {}
+        for (const [key, value] of Object.entries(filteredData)) {
+          const weight = value.setting.filter(each => each.weight > 0)
+          console.log(weight)
+          if (value.difficulty && (value.hasWeight && weight.length || !value.hasWeight))
+            toReturn[key] = value
+        }
+        return toReturn
+      }
+    },
+    methods: {
+      showSnackbar(message, type) {
+        this.snackBarMessage = message
+        this.snackBarClass = `active ${type}`
+        setTimeout(() => this.snackBarClass = "", 3000)
+      },
+      convertDifficulty(difficulty) {
+        const data = {
+          "1": "Fácil",
+          "2": "Médio",
+          "3": "Difícil"
+        }
+        return data[difficulty]
+      },
+      formatSetting(setting, hasWeight) {
+        let data
+        if (hasWeight) {
+          data = setting.map(value => `${value.repetition} x ${value.weight} kg`)
+        }
+        else
+          data = setting.map(value => `${value.repetition}`)
+        return data.join(", ")
+      },
+    }
+  }).mount('#app')
+</script>
