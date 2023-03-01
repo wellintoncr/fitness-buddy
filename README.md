@@ -26,6 +26,10 @@ python3 -m http.server
 
 - [x] [ *Melhoria* ] Visualizar histórico de treinos
 
+- [ ] [ *Bug* ] Datas inconsistentes: ao extrair a data, deve se levar em consideração o fuso horário e converter para a data local
+
+- [ ] [ *Melhoria* ] Adicionar nota ao fazer o treino (exemplo: focar em aumentar amplitude do movimento) e essa informação ficar disponível durante os treinos (podendo ser editada novamente)
+
 - [ ] [ *Melhoria* ] Sugerir carga - indicar se o treino do dia deve manter ou aumentar a carga;
 
 - [ ] [ *Melhoria* ] Editar e apagar treinos;
