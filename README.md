@@ -1,43 +1,41 @@
-# Fitness Buddy
+# fitness-buddy
 
-A proposta do projeto é ser um assistente que acompanha sua saúde.
+This template should help get you started developing with Vue 3 in Vite.
 
+## Recommended IDE Setup
 
-# Como?
+[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
 
-Por questão de simplicidade, esta aplicação usa o localStorage do navegador para armazenar todos os dados - por isso não há login.
-A vantagem é a simplicidade e a desvantagem é que, caso haja uma limpeza de cache, os dados serão perdidos.
+## Customize configuration
 
+See [Vite Configuration Reference](https://vitejs.dev/config/).
 
-# Como usar?
+## Project Setup
 
-Acesse a URL [do projeto](https://wellintoncr.github.io/fitness-buddy) e pronto. Haverá builds novas a cada push em **main**.
-
-Caso queira executar localmente: apesar de serem apenas arquivos estáticos, os navegadores podem considerar cada arquivo como um domínio, então não seria possível acessar o mesmo localStorage em todas as telas.
-Para resolver isso, basta levantar um servidor local que sirva os dados. Com Python 3, basta:
 ```sh
-cd este-projeto
-python3 -m http.server
+npm install
 ```
 
-# Tarefas
+### Compile and Hot-Reload for Development
 
-- [x] [ *Bug* ] Ao selecionar a dificuldade do treino, apenas um treino está sendo selecionado por vez (ex. marco "Difícil" no treino A e, ao marcar "Fácil" no treino B, a dificuldade do treino A é perdida);
+```sh
+npm run dev
+```
 
-- [x] [ *Melhoria* ] Visualizar histórico de treinos
+### Compile and Minify for Production
 
-- [ ] [ *Bug* ] Datas inconsistentes: ao extrair a data, deve se levar em consideração o fuso horário e converter para a data local
+```sh
+npm run build
+```
 
-- [ ] [ *Melhoria* ] Adicionar nota ao fazer o treino (exemplo: focar em aumentar amplitude do movimento) e essa informação ficar disponível durante os treinos (podendo ser editada novamente)
+### Run Unit Tests with [Vitest](https://vitest.dev/)
 
-- [ ] [ *Melhoria* ] Sugerir carga - indicar se o treino do dia deve manter ou aumentar a carga;
+```sh
+npm run test:unit
+```
 
-- [ ] [ *Melhoria* ] Editar e apagar treinos;
+### Lint with [ESLint](https://eslint.org/)
 
-- [ ] [ *Melhoria* ] Exportar e importar dados - por se tratar de localStorage, seria interessante haver alguma forma de fazer e restaurar backups;
-
-- [ ] [ *Melhoria* ] Ao cadastrar um treino, inserir as cargas disponíveis para que o assistente consiga sugerir a carga do dia;
-
-- [ ] [ *Melhoria* ] Assistente de métricas corporais - registrar peso e medidas corporais;
-
-- [ ] [ *Melhoria* ] Visualizar histórico de métricas corporais
+```sh
+npm run lint
+```
